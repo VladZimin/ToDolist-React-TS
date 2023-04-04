@@ -25,6 +25,11 @@ function App() {
         const newTask: TaskType = {id: v1(), title, isDone: false}
         setTasks([newTask, ...tasks])
     }
+    const changeTaskStatus = (taskId: string, isDone: boolean) => {
+        const changedTask = tasks.find( obj => obj.id === taskId)
+        if (changedTask) changedTask.isDone = isDone
+        setTasks([...tasks])
+    }
 
     let tasksForList = tasks
     if (filter === 'active') {
@@ -42,6 +47,8 @@ function App() {
                 removeTask={removeTask}
                 changeFilter={changeFilter}
                 addTask={addTask}
+                changeTaskStatus={changeTaskStatus}
+                filter={filter}
             />
         </div>
     )
