@@ -1,5 +1,7 @@
-import React, {ChangeEvent, KeyboardEvent, FC, useState} from 'react'
+import React, {ChangeEvent, FC} from 'react'
 import {FilterValuesType} from './App'
+import {AddItemForm} from './components/AddItemForm'
+import {EditableSpan} from './components/EditableSpan'
 
 export type TaskType = {
     id: string
@@ -14,6 +16,8 @@ type PropsType = {
     addTask: (title: string, todoId: string) => void
     changeTaskStatus: (taskId: string, todoId: string, isDone: boolean) => void
     changeFilter: (value: FilterValuesType, todoId: string) => void
+    changeTodoTitle: (title: string, todoId: string) => void
+    changeTaskTitle: (title: string, taskId: string, todoId: string) => void
     filter: FilterValuesType
     todoId: string
 }
@@ -22,46 +26,34 @@ export const TodoList: FC<PropsType> = ({
                                             removeTask, removeTodoList,
                                             addTask, changeTaskStatus,
                                             changeFilter, filter,
-                                            todoId
+                                            todoId, changeTodoTitle,
+                                            changeTaskTitle
                                         }) => {
-
-    const [inputValue, setInputValue] = useState<string>('')
-    const [error, setError] = useState<string>('')
-
-    const changeInputHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        setError('')
-        setInputValue(e.currentTarget.value)
-    }
-    const keyDownHandler = (e: KeyboardEvent<HTMLInputElement>) => {
-        e.ctrlKey && e.key === 'Enter' && addTaskHandler()
-    }
-    const addTaskHandler = () => {
-        const trimmedValue = inputValue.trim()
-        if (trimmedValue) addTask(trimmedValue, todoId)
-        else setError('Title is required!')
-        setInputValue('')
-    }
     const removeTodoListHandler = () => {
         removeTodoList(todoId)
+    }
+    const addTaskHandler = (taskTitle: string) => {
+        addTask(taskTitle, todoId)
+    }
+    const changeTodoTitleHandler = (title: string) => {
+        changeTodoTitle(title, todoId)
     }
 
     return (
         <div>
-            <h3>{title} <button onClick={removeTodoListHandler}>X</button></h3>
-            <div>
-                <input onChange={changeInputHandler}
-                       onKeyDown={keyDownHandler}
-                       value={inputValue}
-                       className={error ? 'error' : ''}
-                />
-                <button onClick={addTaskHandler}>+</button>
-                <div className={'error-message'}>{error}</div>
-            </div>
+            <h3>
+                <EditableSpan title={title} onChange={changeTodoTitleHandler}/>
+                <button onClick={removeTodoListHandler}>X</button>
+            </h3>
+            <AddItemForm addItem={addTaskHandler}/>
             <ul>
                 {
                     tasks.map(obj => {
                         const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
                             changeTaskStatus(obj.id, todoId, e.currentTarget.checked)
+                        }
+                        const changeTaskTitleHandler = (title: string) => {
+                            changeTaskTitle(title, obj.id, todoId)
                         }
 
                         return (
@@ -70,7 +62,7 @@ export const TodoList: FC<PropsType> = ({
                                        onChange={changeTaskStatusHandler}
                                        checked={obj.isDone}
                                 />
-                                <span>{obj.title}</span>
+                                <EditableSpan title={obj.title} onChange={changeTaskTitleHandler}/>
                                 <button onClick={() => removeTask(obj.id, todoId)}>X</button>
                             </li>
                         )
@@ -88,3 +80,4 @@ export const TodoList: FC<PropsType> = ({
         </div>
     )
 }
+
