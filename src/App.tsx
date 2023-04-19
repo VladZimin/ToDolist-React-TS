@@ -3,6 +3,8 @@ import './App.css'
 import {TaskType, TodoList} from './TodoList'
 import {v1} from 'uuid'
 import {AddItemForm} from './components/AddItemForm'
+import {AppBar, Button, Container, Grid, IconButton, Paper, Toolbar, Typography} from '@mui/material'
+import {Menu} from '@mui/icons-material'
 
 const todoListId1 = v1()
 const todoListId2 = v1()
@@ -81,35 +83,61 @@ function App() {
 
     return (
         <div className="App">
-            <AddItemForm addItem={addTodoList}/>
-            {
-                todoLists.map(obj => {
-                    let tasksForList = allTasks[obj.id]
-                    if (obj.filter === 'active') {
-                        tasksForList = tasksForList.filter(obj => !obj.isDone)
-                    }
+            <AppBar position="static">
+                <Toolbar>
+                    <IconButton
+                        size="large"
+                        edge="start"
+                        color="inherit"
+                        aria-label="menu"
+                        sx={{mr: 2}}
+                    >
+                        <Menu/>
+                    </IconButton>
+                    <Typography variant="h6" component="div" sx={{flexGrow: 1}}>
+                        News
+                    </Typography>
+                    <Button color="inherit">Login</Button>
+                </Toolbar>
+            </AppBar>
+            <Container fixed>
+                <Grid container style={{padding: '15px'}}>
+                    <AddItemForm addItem={addTodoList}/>
+                </Grid>
+                <Grid container spacing={2}>
+                    {
+                        todoLists.map(obj => {
+                            let tasksForList = allTasks[obj.id]
+                            if (obj.filter === 'active') {
+                                tasksForList = tasksForList.filter(obj => !obj.isDone)
+                            }
 
-                    if (obj.filter === 'completed') {
-                        tasksForList = tasksForList.filter(obj => obj.isDone)
+                            if (obj.filter === 'completed') {
+                                tasksForList = tasksForList.filter(obj => obj.isDone)
+                            }
+                            return (
+                                <Grid item key={obj.id}>
+                                    <Paper elevation={2} style={{padding: '10px'}}>
+                                        <TodoList
+                                            todoId={obj.id}
+                                            title={obj.title}
+                                            tasks={tasksForList}
+                                            removeTask={removeTask}
+                                            removeTodoList={removeTodoList}
+                                            addTask={addTask}
+                                            changeTaskStatus={changeTaskStatus}
+                                            changeFilter={changeFilter}
+                                            changeTodoTitle={changeTodoTitle}
+                                            changeTaskTitle={changeTaskTitle}
+                                            filter={obj.filter}
+                                        />
+                                    </Paper>
+                                </Grid>
+                            )
+                        })
                     }
-                    return (
-                        <TodoList
-                            key={obj.id}
-                            todoId={obj.id}
-                            title={obj.title}
-                            tasks={tasksForList}
-                            removeTask={removeTask}
-                            removeTodoList={removeTodoList}
-                            addTask={addTask}
-                            changeTaskStatus={changeTaskStatus}
-                            changeFilter={changeFilter}
-                            changeTodoTitle={changeTodoTitle}
-                            changeTaskTitle={changeTaskTitle}
-                            filter={obj.filter}
-                        />
-                    )
-                })
-            }
+                </Grid>
+            </Container>
         </div>
     )
 }

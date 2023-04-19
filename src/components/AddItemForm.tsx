@@ -1,4 +1,6 @@
 import React, {ChangeEvent, FC, KeyboardEvent, useState} from 'react'
+import {IconButton, TextField} from '@mui/material'
+import {ControlPoint} from '@mui/icons-material'
 
 type AddItemFormType = {
     addItem: (title: string) => void
@@ -17,21 +19,26 @@ export const AddItemForm: FC<AddItemFormType> = ({addItem}) => {
     const addItemHandler = () => {
         const trimmedValue = inputValue.trim()
         if (trimmedValue) addItem(trimmedValue)
-    else
-        setError('Title is required!')
+        else
+            setError('Title is required!')
         setInputValue('')
 
     }
 
     return (
         <div>
-            <input onChange={changeInputHandler}
-                   onKeyDown={keyDownHandler}
-                   value={inputValue}
-                   className={error ? 'error' : ''}
+            <TextField
+                onChange={changeInputHandler}
+                onKeyDown={keyDownHandler}
+                value={inputValue}
+                className={error ? 'error' : ''}
+                size={'small'}
+                error={!!error}
+                helperText={error}
             />
-            <button onClick={addItemHandler}>+</button>
-            <div className={'error-message'}>{error}</div>
+            <IconButton onClick={addItemHandler}>
+                <ControlPoint color={'primary'} />
+            </IconButton>
         </div>
     )
 }
