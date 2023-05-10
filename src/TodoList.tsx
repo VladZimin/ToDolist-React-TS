@@ -1,44 +1,39 @@
 import React, {ChangeEvent, FC} from 'react'
-import {FilterValuesType} from './App'
 import {AddItemForm} from './components/AddItemForm'
 import {EditableSpan} from './components/EditableSpan'
 import {Button, Checkbox, IconButton} from '@mui/material'
 import {Bookmark, BookmarkBorder, DeleteForeverTwoTone, HighlightOffTwoTone} from '@mui/icons-material'
+import {useDispatch, useSelector} from 'react-redux'
+import {AppRootStateType} from './state/store'
+import {changeTodoListFilter, changeTodoListTitle, removeTodoList, TodoListType} from './state/todoList-reducer'
+import {addTask, changeTaskStatus, changeTaskTitle, removeTask, TaskType} from './state/tasks-reducer'
 
-export type TaskType = {
-    id: string
-    title: string
-    isDone: boolean
-}
+
 type PropsType = {
-    title: string
-    tasks: TaskType[]
-    removeTask: (id: string, todoId: string) => void
-    removeTodoList: (todoId: string) => void
-    addTask: (title: string, todoId: string) => void
-    changeTaskStatus: (taskId: string, todoId: string, isDone: boolean) => void
-    changeFilter: (value: FilterValuesType, todoId: string) => void
-    changeTodoTitle: (title: string, todoId: string) => void
-    changeTaskTitle: (title: string, taskId: string, todoId: string) => void
-    filter: FilterValuesType
-    todoId: string
+    todoList: TodoListType
 }
-export const TodoList: FC<PropsType> = ({
-                                            tasks, title,
-                                            removeTask, removeTodoList,
-                                            addTask, changeTaskStatus,
-                                            changeFilter, filter,
-                                            todoId, changeTodoTitle,
-                                            changeTaskTitle
-                                        }) => {
+export const TodoList: FC<PropsType> = ({todoList}) => {
+
+    const {id, title, filter} = todoList
+    let tasks = useSelector<AppRootStateType, Array<TaskType>>(state => state.tasks[id])
+    const dispatch = useDispatch()
+
     const removeTodoListHandler = () => {
-        removeTodoList(todoId)
+       dispatch(removeTodoList(id))
     }
     const addTaskHandler = (taskTitle: string) => {
-        addTask(taskTitle, todoId)
+        dispatch(addTask(taskTitle, id))
     }
     const changeTodoTitleHandler = (title: string) => {
-        changeTodoTitle(title, todoId)
+        dispatch(changeTodoListTitle(id, title))
+    }
+
+    if (filter === 'active') {
+        tasks = tasks.filter(obj => !obj.isDone)
+    }
+
+    if (filter === 'completed') {
+        tasks = tasks.filter(obj => obj.isDone)
     }
 
     return (
@@ -55,10 +50,10 @@ export const TodoList: FC<PropsType> = ({
                 {
                     tasks.map(obj => {
                         const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
-                            changeTaskStatus(obj.id, todoId, e.currentTarget.checked)
+                            dispatch(changeTaskStatus(obj.id,  e.currentTarget.checked, id))
                         }
                         const changeTaskTitleHandler = (title: string) => {
-                            changeTaskTitle(title, obj.id, todoId)
+                            dispatch(changeTaskTitle( obj.id, title, id))
                         }
 
                         return (
@@ -71,7 +66,7 @@ export const TodoList: FC<PropsType> = ({
                                 />
                                 <EditableSpan style={obj.isDone ? 'is-done' : ''} title={obj.title}
                                               onChange={changeTaskTitleHandler}/>
-                                <IconButton onClick={() => removeTask(obj.id, todoId)}>
+                                <IconButton onClick={() => dispatch(removeTask(obj.id, id))}>
                                     <DeleteForeverTwoTone color={'error'}/>
                                 </IconButton>
                             </div>
@@ -80,11 +75,11 @@ export const TodoList: FC<PropsType> = ({
                 }
             </div>
             <div>
-                <Button onClick={() => changeFilter('all', todoId)}
+                <Button onClick={() => dispatch(changeTodoListFilter(id, 'all'))}
                         variant={filter === 'all' ? 'contained' : 'outlined'}>All</Button>
-                <Button onClick={() => changeFilter('active', todoId)}
+                <Button onClick={() => dispatch(changeTodoListFilter(id, 'active'))}
                         variant={filter === 'active' ? 'contained' : 'outlined'}>Active</Button>
-                <Button onClick={() => changeFilter('completed', todoId)}
+                <Button onClick={() => dispatch(changeTodoListFilter(id, 'completed'))}
                         variant={filter === 'completed' ? 'contained' : 'outlined'}>Completed</Button>
             </div>
         </div>
