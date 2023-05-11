@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import {AllTasksType} from '../App'
+>>>>>>> origin/master
 import {v1} from 'uuid'
 import {AddTodoListActionType, RemoveTodoListActionType} from './todoList-reducer'
 
@@ -5,6 +9,10 @@ type RemoveTaskActionType = ReturnType<typeof removeTask>
 type AddTaskActionType = ReturnType<typeof addTask>
 type ChangeTaskStatusActionType = ReturnType<typeof changeTaskStatus>
 type ChangeTaskTitleActionType = ReturnType<typeof changeTaskTitle>
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 type ActionsType =
     RemoveTaskActionType
     | AddTaskActionType
@@ -13,6 +21,7 @@ type ActionsType =
     | AddTodoListActionType
     | RemoveTodoListActionType
 
+<<<<<<< HEAD
 export type TaskType = {
     id: string
     title: string
@@ -25,6 +34,9 @@ export type AllTasksType = {
 const initState: AllTasksType = {}
 
 export const tasksReducer = (state = initState, action: ActionsType): AllTasksType => {
+=======
+export const tasksReducer = (state: AllTasksType, action: ActionsType): AllTasksType => {
+>>>>>>> origin/master
     switch (action.type) {
         case 'REMOVE_TASK':
             return {
